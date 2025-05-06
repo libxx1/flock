@@ -1,65 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Flock XR Embed</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background-color: #000;
-    }
-    canvas {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-  </style>
-</head>
-<body>
-  <canvas id="renderCanvas"></canvas>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Flock XR Embed</title>
+    <style>
+      html, body, canvas {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="renderCanvas"></canvas>
 
-  <!-- Babylon.js CDN -->
-  <script src="https://cdn.babylonjs.com/babylon.js"></script>
-  <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+    <!-- Babylon.js -->
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
 
-  <script>
-    // Grab the canvas element
-    const canvas = document.getElementById("renderCanvas");
+    <script>
+      const canvas = document.getElementById("renderCanvas");
+      const engine = new BABYLON.Engine(canvas, true);
 
-    // Initialize engine and scene
-    const engine = new BABYLON.Engine(canvas, true);
-    const scene = new BABYLON.Scene(engine);
+      const urlParams = new URLSearchParams(window.location.search);
+      const projectUrl = urlParams.get('project');
 
-    // Set up a basic environment (camera + light)
-    const camera = new BABYLON.ArcRotateCamera("camera", Math.PI / 2, Math.PI / 3, 10, new BABYLON.Vector3(0, 1, 0), scene);
-    camera.attachControl(canvas, true);
-    const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
+      if (!projectUrl) {
+        alert("No project URL specified.");
+      } else {
+        BABYLON.SceneLoader.Load("", projectUrl, engine, function (scene) {
+          scene.createDefaultCameraOrLight(true, true, true);
+          engine.runRenderLoop(function () {
+            scene.render();
+          });
+        }, null, function (scene, message) {
+          console.error("Failed to load scene:", message);
+        });
+      }
 
-    // Get project URL from query string
-    const urlParams = new URLSearchParams(window.location.search);
-    const projectUrl = urlParams.get('project');
-
-    if (projectUrl) {
-      // Load scene from the given project URL
-      BABYLON.SceneLoader.Append("", projectUrl, scene, function () {
-        engine.runRenderLoop(() => scene.render());
-      }, null, function (scene, message, exception) {
-        console.error("Error loading scene:", message, exception);
+      window.addEventListener("resize", function () {
+        engine.resize();
       });
-    } else {
-      console.warn("No project URL provided. Use ?project=URL");
-      engine.runRenderLoop(() => scene.render());
-    }
-
-    // Handle window resize
-    window.addEventListener("resize", () => {
-      engine.resize();
-    });
-  </script>
-</body>
+    </script>
+  </body>
 </html>
