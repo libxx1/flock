@@ -16,32 +16,46 @@
     <canvas id="renderCanvas"></canvas>
 
     <!-- Babylon.js -->
-    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script src="https://cdn.babylonjs.com/babylon.js?v=5.0.0"></script>
     <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
 
     <script>
+      // Get the canvas element and create the engine
       const canvas = document.getElementById("renderCanvas");
       const engine = new BABYLON.Engine(canvas, true);
 
+      // Parse the URL to get the project URL (the scene file)
       const urlParams = new URLSearchParams(window.location.search);
       const projectUrl = urlParams.get('project');
 
       if (!projectUrl) {
         alert("No project URL specified.");
       } else {
+        // Log the loading of plugins (just for debugging purposes)
+        BABYLON.SceneLoader.OnPluginActivatedObservable.add(function (plugin) {
+          console.log("Plugin loaded:", plugin.name);
+        });
+
+        // Load the scene from the provided URL
         BABYLON.SceneLoader.Load("", projectUrl, engine, function (scene) {
+          // Create default camera and light if the scene doesn't have them
           scene.createDefaultCameraOrLight(true, true, true);
+
+          // Run the render loop
           engine.runRenderLoop(function () {
             scene.render();
           });
         }, null, function (scene, message) {
+          // Handle error if loading the scene fails
           console.error("Failed to load scene:", message);
         });
       }
 
+      // Resize the engine when the window size changes
       window.addEventListener("resize", function () {
         engine.resize();
       });
     </script>
   </body>
 </html>
+
