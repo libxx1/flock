@@ -1,53 +1,34 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8" />
     <title>Flock XR Embed</title>
+    <base href="/flock/" />
     <style>
-      html, body, canvas {
+      html, body, #renderCanvas {
+        margin: 0;
+        padding: 0;
         width: 100%;
         height: 100%;
-        margin: 0;
         overflow: hidden;
+      }
+      #renderCanvas {
+        display: block;
       }
     </style>
   </head>
   <body>
     <canvas id="renderCanvas"></canvas>
+    <script type="module">
+      import { startFlock } from './src/main.ts'; // Adjust if needed
+      const params = new URLSearchParams(window.location.search);
+      const projectURL = params.get("project");
 
-    <!-- Babylon.js -->
-    <script src="https://cdn.babylonjs.com/babylon.js?v=5.0.0"></script>
-    <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
-
-    <script>
-      const canvas = document.getElementById("renderCanvas");
-      const engine = new BABYLON.Engine(canvas, true);
-
-      const urlParams = new URLSearchParams(window.location.search);
-      const projectUrl = urlParams.get('project');
-
-      if (!projectUrl) {
-        alert("No project URL specified.");
-      } else {
-        // Use the correct SceneLoader function
-        BABYLON.SceneLoader.Append("", projectUrl, engine, function (scene) {
-          // Create default camera and light if not in the scene
-          scene.createDefaultCameraOrLight(true, true, true);
-
-          // Run the render loop
-          engine.runRenderLoop(function () {
-            scene.render();
-          });
-        }, null, function (scene, message) {
-          // Error loading scene
-          console.error("Failed to load scene:", message);
-        });
-      }
-
-      window.addEventListener("resize", function () {
-        engine.resize();
+      startFlock({
+        canvasId: 'renderCanvas',
+        projectUrl: projectURL,
+        ui: false  // Hypothetical flag to suppress UI, depending on Flock
       });
     </script>
   </body>
 </html>
-
