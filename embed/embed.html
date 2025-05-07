@@ -19,16 +19,22 @@
   </head>
   <body>
     <canvas id="renderCanvas"></canvas>
-    <script type="module">
-      import { startFlock } from './src/main.ts'; // Adjust if needed
+
+    <script src="./build/main.js"></script>
+    <script>
       const params = new URLSearchParams(window.location.search);
       const projectURL = params.get("project");
 
-      startFlock({
-        canvasId: 'renderCanvas',
-        projectUrl: projectURL,
-        ui: false  // Hypothetical flag to suppress UI, depending on Flock
-      });
+      // You might need to call a global function like window.startFlock()
+      if (window.startFlock) {
+        window.startFlock({
+          canvasId: 'renderCanvas',
+          projectUrl: projectURL,
+          ui: false  // or similar flag if supported
+        });
+      } else {
+        console.error("startFlock is not defined. Check your build output.");
+      }
     </script>
   </body>
 </html>
